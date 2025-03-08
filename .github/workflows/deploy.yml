@@ -20,10 +20,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Instalar Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
       - name: Construir o JAR
-        run: |
-          chmod +x mvnw
-          ./mvnw clean package -DskipTests
+        run: mvn clean package -DskipTests
 
       - name: Login no Oracle Container Registry (OCIR)
         run: |
