@@ -1,0 +1,35 @@
+name: Deploy to Oracle Cloud
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Construir o JAR
+        run: |
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests
+
+      - name: Login no Oracle Container Registry (OCIR)
+        run: |
+          echo "${{ secrets.OCIR_PASSWORD }}" | docker login -u "${{ secrets.OCIR_NAMESPACE }}/${{ secrets.OCIR_USERNAME }}" --password-stdin ocir.sa-saopaulo-1.oci.oraclecloud.com
+
+      - name: Construir e enviar a imagem Docker para OCIR
+        run: |
+          docker build -t ocir.sa-saopaulo-1.oci.oraclecloud.com/${{ secrets.OCIR_NAMESPACE }}/bin:latest .
+          docker push ocir.sa-saopaulo-1.oci.oraclecloud.com/${{ secrets.OCIR_NAMESPACE }}/bin:latest
