@@ -49,5 +49,9 @@ jobs:
             docker pull ocir.sa-saopaulo-1.oci.oraclecloud.com/${{ secrets.OCIR_NAMESPACE }}/bin:latest
             docker stop service-bin || true
             docker rm service-bin || true
-            docker run -d --restart always -p 8080:8080 --name service-bin ocir.sa-saopaulo-1.oci.oraclecloud.com/${{ secrets.OCIR_NAMESPACE }}/bin:latest
+            docker run -d --restart always -p 8080:8080 --name service-bin \
+              -e DB_HOST=${{ secrets.DB_HOST }} \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              ocir.sa-saopaulo-1.oci.oraclecloud.com/${{ secrets.OCIR_NAMESPACE }}/bin:latest
           EOF

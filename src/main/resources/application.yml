@@ -2,10 +2,13 @@ spring:
   application:
     name: bin
 
+  config:
+    import: optional:file:.env[.properties]
+
   datasource:
-    url: jdbc:postgresql://137.131.187.199:5432/recoleta
-    username: recoleta
-    password: recoleta
+    url: jdbc:postgresql://${DB_HOST}:5432/recoleta
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
