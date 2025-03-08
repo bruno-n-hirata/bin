@@ -34,3 +34,20 @@ jobs:
         run: |
           docker build -t ocir.sa-saopaulo-1.oci.oraclecloud.com/${{ secrets.OCIR_NAMESPACE }}/bin:latest .
           docker push ocir.sa-saopaulo-1.oci.oraclecloud.com/${{ secrets.OCIR_NAMESPACE }}/bin:latest
+
+      - name: Configurar SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy para Oracle Cloud
+        run: |
+          ssh ubuntu@${{ secrets.SSH_HOST }} << 'EOF'
+            echo "${{ secrets.OCIR_PASSWORD }}" | docker login -u "${{ secrets.OCIR_NAMESPACE }}/${{ secrets.OCIR_USERNAME }}" --password-stdin ocir.sa-saopaulo-1.oci.oraclecloud.com
+            docker pull ocir.sa-saopaulo-1.oci.oraclecloud.com/${{ secrets.OCIR_NAMESPACE }}/bin:latest
+            docker stop service-bin || true
+            docker rm service-bin || true
+            docker run -d --restart always -p --name service-bin ocir.sa-saopaulo-1.oci.oraclecloud.com/${{ secrets.OCIR_NAMESPACE }}/bin:latest
+          EOF
