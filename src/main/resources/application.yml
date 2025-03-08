@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: bin
+
+  datasource:
+    url: jdbc:postgresql://137.131.187.199:5432/recoleta
+    username: recoleta
+    password: recoleta
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
